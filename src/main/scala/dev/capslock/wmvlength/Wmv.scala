@@ -1,16 +1,17 @@
 package dev.capslock.wmvlength
 
 import scodec.bits.{ByteVector, hex}
-import scodec.codecs.{*, given}
-import scodec.{*, given}
+import scodec.codecs.*
+import scodec.*
+import Combinators.uint64LDecoder
 
 import scala.concurrent.duration.FiniteDuration
 
 object Wmv {
-  private val uint64LDecoder = for
-    l <- uint32L // due to little endian, lower bytes are read fast
-    h <- uint32L
-  yield (BigInt(h) << 32) | BigInt(l)
+  // Utility to construct Little Endian binary from hex format
+  extension (bv: ByteVector) {
+    private def toLE: ByteVector = bv.reverse
+  }
 
   // Preamble is guid. CAVEAT! In windows, guid is LE-LE-LE-BE.
   private val globalPreambleGuid =
@@ -31,18 +32,14 @@ object Wmv {
       ~> constant(fileInfoPrembleGuid._3)
       ~> constant(fileInfoPrembleGuid._4)
 
-  case class HeaderObjectInfo(
+  private case class HeaderObjectInfo(
       headerSize: BigInt,
       headerCount: Long,
-      //   fileProps: FileProperties,
   )
+
   enum HeaderObject:
     case FileProperties(playDuration: FiniteDuration)
     case Otherwise
-
-  extension (bv: ByteVector) {
-    private def toLE: ByteVector = bv.reverse
-  }
 
   private val filePropertiesDecoder =
     for
