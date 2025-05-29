@@ -12,7 +12,7 @@ object HeaderObject {
       headerCount: Long,
   )
   object Header {
-    val headerObjectHeaderDecoder =
+    val headerObjectHeaderDecoder: Decoder[Header] =
       for
         size  <- uint64LDecoder
         count <- uint32L
