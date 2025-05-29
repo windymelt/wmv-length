@@ -8,6 +8,8 @@ import Combinators.uint64LDecoder
 import scala.concurrent.duration.FiniteDuration
 
 object HeaderObject {
+  // Header Object consists of header and value fields
+
   // Utility to construct Little Endian binary from hex format
   extension (bv: ByteVector) {
     private def toLE: ByteVector = bv.reverse

@@ -11,15 +11,14 @@ object Main {
       throw new Exception("Please specify wmv file as argument")
 
     val filePath = args(0)
-    val fileBody =
-      os.read.bytes(
-        os.pwd / os.SubPath(filePath),
-      ) // TODO: streaming
+    val fileBodyIS = os.read.inputStream(
+      os.pwd / os.SubPath(filePath),
+    )
 
-    val bv           = BitVector(fileBody)
-    val decodeResult = Wmv.wmvDecoder.decode(bv)
+    val bitVector  = BitVector.fromInputStream(fileBodyIS)
+    val decodedAsf = Wmv.wmvDecoder.decode(bitVector)
 
-    val resultJson = decodeResult match
+    val resultJson = decodedAsf match
       case Attempt.Failure(cause) =>
         JsonObject(
           "status"  -> Json.fromString("err"),
