@@ -5,6 +5,7 @@ import scodec.codecs.*
 import scodec.*
 import Combinators.uint64LDecoder
 import format.GlobalHeader.globalPreamble
+import format.HeaderObject.Header.headerObjectHeaderDecoder
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -22,11 +23,6 @@ object Wmv {
       ~> constant(fileInfoPrembleGuid._2)
       ~> constant(fileInfoPrembleGuid._3)
       ~> constant(fileInfoPrembleGuid._4)
-
-  private case class HeaderObjectInfo(
-      headerSize: BigInt,
-      headerCount: Long,
-  )
 
   enum HeaderObject:
     case FileProperties(playDuration: FiniteDuration)
@@ -73,14 +69,6 @@ object Wmv {
           ),
         ),
     ).map(_.fold(identity, identity))
-
-  private val headerObjectHeaderDecoder =
-    for
-      size  <- uint64LDecoder
-      count <- uint32L
-      _     <- constant(hex"01") // reserved
-      _     <- constant(hex"02") // reserved
-    yield HeaderObjectInfo(size, count)
 
   val wmvDecoder: Decoder[HeaderObject] = for
     _   <- globalPreamble.withContext("preamble (whether WMV or not)")
