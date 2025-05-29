@@ -1,6 +1,6 @@
 package dev.capslock.wmvlength
 
-import dev.capslock.wmvlength.Wmv.HeaderObject
+import dev.capslock.wmvlength.format.headerobjects.HeaderObject
 import scodec.bits.BitVector
 import scodec.Attempt
 import io.circe.*
